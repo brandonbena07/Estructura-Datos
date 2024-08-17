@@ -1,19 +1,13 @@
-num1 = float(input("Ingrese el primer número: "))
-num2 = float(input("Ingrese el segundo número: "))
-operacion = input("Ingrese la operación (+, -, x, /): ")
-if operacion == "+":
-    resultado = num1 + num2
-elif operacion == "-":
-    resultado = num1 - num2
-elif operacion == "x":
-    resultado = num1 * num2
-elif operacion == "/":
-    if num2 == 0:
-        print("Error: No se puede dividir entre cero.")
-    else:
-        resultado = num1 / num2
-else:
-    print("Operación inválida. Por favor ingrese +, -, x, o /.")
-    resultado = None  # Asignamos None para indicar que no hay resultado
-if resultado is not None:
-    print(f"{num1} {operacion} {num2} = {resultado}")
+num1 = int(input("Ingrese el primer número: "))
+num2 = int(input("Ingrese el segundo número: "))
+num3 = int(input("Ingrese el tercer número: "))
+
+# Encontrar el número mayor
+
+mayor = max(num1, num2, num3)
+
+# Encontrar el número menor
+
+menor = min(num1, num2, num3)
+print("El número mayor es:", mayor)
+print("El número menor es:", menor)
