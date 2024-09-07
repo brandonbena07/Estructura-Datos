@@ -1,1 +1,0 @@
-def palabra_palindromo (palabras)
