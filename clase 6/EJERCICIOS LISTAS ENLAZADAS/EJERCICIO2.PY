@@ -1,85 +1,99 @@
+import datetime
+
 class Tarea:
-    def __init__(self, descripcion, prioridad, fecha_vencimiento):
+    def _init_(self, descripcion, prioridad, fecha_vencimiento):
         self.descripcion = descripcion
         self.prioridad = prioridad
         self.fecha_vencimiento = fecha_vencimiento
-        self.next = None
+
+class Nodo:
+    def _init_(self, tarea):
+        self.tarea = tarea
+        self.siguiente = None
 
 class ListaTareas:
-    def __init__(self):
-        self.cabeza = None
+    def _init_(self):
+        self.primero = None
 
-    def es_vacio(self):
-        return self.cabeza is None
-
-    def agregar_tarea(self, descripcion, prioridad, fecha_vencimiento):
-        nueva_tarea = Tarea(descripcion, prioridad, fecha_vencimiento)
-        if self.es_vacio() or (self.cabeza.prioridad < prioridad) or (self.cabeza.prioridad == prioridad and self.cabeza.fecha_vencimiento > fecha_vencimiento):
-            nueva_tarea.next = self.cabeza
-            self.cabeza = nueva_tarea
+    def agregar_tarea(self, tarea):
+        nuevo_nodo = Nodo(tarea)
+        if not self.primero:
+            self.primero = nuevo_nodo
         else:
-            nodo_actual = self.cabeza
-            while nodo_actual.next is not None and (nodo_actual.next.prioridad > prioridad or (nodo_actual.next.prioridad == prioridad and nodo_actual.next.fecha_vencimiento <= fecha_vencimiento)):
-                nodo_actual = nodo_actual.next
-            nueva_tarea.next = nodo_actual.next
-            nodo_actual.next = nueva_tarea
+            actual = self.primero
+            while actual.siguiente:
+                actual = actual.siguiente
+            actual.siguiente = nuevo_nodo
 
-    def eliminar_tarea_por_descripcion(self, descripcion):
-        nodo_actual = self.cabeza
-        if nodo_actual is not None:
-            if nodo_actual.descripcion == descripcion:
-                self.cabeza = nodo_actual.next
-                return
-            while nodo_actual.next is not None:
-                if nodo_actual.next.descripcion == descripcion:
-                    nodo_actual.next = nodo_actual.next.next
-                    return
-                nodo_actual = nodo_actual.next
-
-    def eliminar_tarea_por_posicion(self, posicion):
-        nodo_actual = self.cabeza
-        if posicion == 0:
-            self.cabeza = nodo_actual.next
+    def eliminar_tarea(self, descripcion):
+        if not self.primero:
             return
-        contador = 0
-        while nodo_actual is not None and contador < posicion - 1:
-            nodo_actual = nodo_actual.next
-            contador += 1
-        if nodo_actual is not None and nodo_actual.next is not None:
-            nodo_actual.next = nodo_actual.next.next
+        if self.primero.tarea.descripcion == descripcion:
+            self.primero = self.primero.siguiente
+            return
+        actual = self.primero
+        while actual.siguiente:
+            if actual.siguiente.tarea.descripcion == descripcion:
+                actual.siguiente = actual.siguiente.siguiente
+                return
+            actual = actual.siguiente
 
     def mostrar_tareas(self):
-        nodo_actual = self.cabeza
-        while nodo_actual is not None:
-            print(f"Descripción: {nodo_actual.descripcion}, Prioridad: {nodo_actual.prioridad}, Fecha de vencimiento: {nodo_actual.fecha_vencimiento}")
-            nodo_actual = nodo_actual.next
+        tareas = []
+        actual = self.primero
+        while actual:
+            tareas.append(actual.tarea)
+            actual = actual.siguiente
+        tareas.sort(key=lambda x: (x.prioridad, x.fecha_vencimiento))
+        for tarea in tareas:
+            print(f"Descripción: {tarea.descripcion}, Prioridad: {tarea.prioridad}, Fecha: {tarea.fecha_vencimiento}")
 
     def buscar_tarea(self, descripcion):
-        nodo_actual = self.cabeza
-        while nodo_actual is not None:
-            if nodo_actual.descripcion == descripcion:
-                return f"Descripción: {nodo_actual.descripcion}, Prioridad: {nodo_actual.prioridad}, Fecha de vencimiento: {nodo_actual.fecha_vencimiento}"
-            nodo_actual = nodo_actual.next
-        return "Tarea no encontrada"
+        actual = self.primero
+        while actual:
+            if actual.tarea.descripcion == descripcion:
+                return actual.tarea
+            actual = actual.siguiente
+        return None
 
-    def marcar_tarea_completada(self, descripcion):
-        self.eliminar_tarea_por_descripcion(descripcion)
-        
+    def marcar_completada(self, descripcion):
+        self.eliminar_tarea(descripcion)
+
+# Ejemplo de uso
 lista_tareas = ListaTareas()
-print("Agregamos tareas")
-lista_tareas.agregar_tarea("Estudiar para examen", 1, "2024-09-25")
-lista_tareas.agregar_tarea("Comprar víveres", 3, "2024-09-30")
-lista_tareas.agregar_tarea("Hacer ejercicio", 2, "2024-09-23")
 
-print("Mostramos todas las tareas")
-lista_tareas.mostrar_tareas()
+while True:
+    print("\n1. Agregar tarea")
+    print("2. Eliminar tarea")
+    print("3. Mostrar tareas")
+    print("4. Buscar tarea")
+    print("5. Marcar tarea como completada")
+    print("6. Salir")
+    opcion = input("Elige una opción: ")
 
-print("Buscamos tarea por descripción")
-resultado_busqueda = lista_tareas.buscar_tarea("Hacer ejercicio")
-print(resultado_busqueda)
-
-print("Marcamos tarea como completada")
-lista_tareas.marcar_tarea_completada("Hacer ejercicio")
-
-print("Mostramos todas las tareas tras completar una")
-lista_tareas.mostrar_tareas()
+    if opcion == "1":
+        descripcion = input("Descripción de la tarea: ")
+        prioridad = int(input("Prioridad (1-3): "))
+        fecha = input("Fecha de vencimiento (YYYY-MM-DD): ")
+        fecha_vencimiento = datetime.datetime.strptime(fecha, "%Y-%m-%d").date()
+        tarea = Tarea(descripcion, prioridad, fecha_vencimiento)
+        lista_tareas.agregar_tarea(tarea)
+    elif opcion == "2":
+        descripcion = input("Descripción de la tarea a eliminar: ")
+        lista_tareas.eliminar_tarea(descripcion)
+    elif opcion == "3":
+        lista_tareas.mostrar_tareas()
+    elif opcion == "4":
+        descripcion = input("Descripción de la tarea a buscar: ")
+        tarea = lista_tareas.buscar_tarea(descripcion)
+        if tarea:
+            print(f"Tarea encontrada: {tarea.descripcion}, Prioridad: {tarea.prioridad}, Fecha: {tarea.fecha_vencimiento}")
+        else:
+            print("Tarea no encontrada")
+    elif opcion == "5":
+        descripcion = input("Descripción de la tarea completada: ")
+        lista_tareas.marcar_completada(descripcion)
+    elif opcion == "6":
+        break
+    else:
+        print("Opción no válida")
